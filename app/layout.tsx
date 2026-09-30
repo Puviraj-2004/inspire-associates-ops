@@ -22,8 +22,8 @@ export const metadata: Metadata = {
     title: 'Inspire Tracker',
   },
   icons: {
-    icon: '/icon.png',
-    apple: '/icon.png', // iPhone home screen icon
+    icon: '/favicon.ico', // Favicon for browsers
+    apple: '/favicon.ico', // iPhone home screen icon
   },
 };
 
