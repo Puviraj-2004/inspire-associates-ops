@@ -1,0 +1,106 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum TaskStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CARRIED_OVER
+}
+
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  fullName     String
+  passwordHash String
+  role         Role        @default(STAFF)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  tasks        Task[]
+  comments     Comment[]
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  tasks     Task[]
+
+  @@map("categories")
+}
+
+model Task {
+  id              String      @id @default(uuid())
+  title           String
+  description     String
+  estimatedTime   String      // e.g., "2 hrs", "30 mins"
+  status          TaskStatus  @default(PLANNED)
+
+  // Work completion data
+  completionNotes String?
+  completionLinks String[]    @default([]) // Multiple URLs array
+
+  // Carry-over (Next day progress) data
+  carryOverNotes  String?
+
+  // Relations
+  staffId         String
+  staff           User        @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  categoryId      String
+  category        Category    @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  comments        Comment[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([staffId])
+  @@index([createdAt])
+  @@map("tasks")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  text      String
+  reaction  String?  // e.g., "👍", "🔥", "APPROVED", "CHANGES_NEEDED"
+  
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("comments")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userName  String
+  action    String   // 'LOGIN', 'LOGOUT', 'TASK_CREATED', 'TASK_COMPLETED', 'TASK_CARRIED_OVER', 'TASK_DELETED'
+  details   String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("audit_logs")
+}
