@@ -15,6 +15,7 @@ import {
   Clock 
 } from 'lucide-react';
 import InstantFilter from '@/components/InstantFilter';
+import { formatSriLankaDate, formatSriLankaTime } from '@/lib/utils';
 
 interface LogsPageProps {
   searchParams: Promise<{
@@ -95,7 +96,6 @@ export default async function AdminLogsPage({ searchParams }: LogsPageProps) {
           <div className="divide-y divide-slate-100">
             {logs.map((log) => {
               const { icon: Icon, color } = getActionBadge(log.action);
-              const logDate = new Date(log.createdAt);
 
               return (
                 <div key={log.id} className="p-4 sm:p-5 flex items-start justify-between gap-4 hover:bg-slate-50/60 transition">
@@ -124,10 +124,10 @@ export default async function AdminLogsPage({ searchParams }: LogsPageProps) {
                   <div className="text-right shrink-0">
                     <span className="flex items-center gap-1 text-[11px] font-bold text-slate-500">
                       <Clock size={12} />
-                      {logDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {formatSriLankaTime(log.createdAt)}
                     </span>
                     <span className="text-[10px] text-slate-400 font-medium block">
-                      {logDate.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {formatSriLankaDate(log.createdAt)}
                     </span>
                   </div>
                 </div>
