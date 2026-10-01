@@ -15,6 +15,7 @@ import {
   User, 
   Tag 
 } from 'lucide-react';
+import AdminEditTaskModal from '@/components/AdminEditTaskModal';
 
 interface AdminDashboardProps {
   searchParams: Promise<{
@@ -164,21 +165,26 @@ export default async function AdminDashboardPage({ searchParams }: AdminDashboar
                     </span>
                   </div>
 
-                  {/* Admin Delete Action */}
-                  <form
-                    action={async () => {
-                      'use server';
-                      await adminDeleteTaskAction(task.id);
-                    }}
-                  >
-                    <button
-                      type="submit"
-                      className="flex items-center gap-1.5 text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-lg transition"
+                  <div className="flex items-center gap-2">
+                    {/* 1. Admin Edit Modal (No 5-min limit) */}
+                    <AdminEditTaskModal task={task} categories={categories} />
+
+                    {/* 2. Admin Delete Action */}
+                    <form
+                      action={async () => {
+                        'use server';
+                        await adminDeleteTaskAction(task.id);
+                      }}
                     >
-                      <Trash2 size={14} />
-                      Delete Task
-                    </button>
-                  </form>
+                      <button
+                        type="submit"
+                        className="flex items-center gap-1.5 text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 px-3 py-1.5 rounded-lg transition"
+                      >
+                        <Trash2 size={13} />
+                        Delete
+                      </button>
+                    </form>
+                  </div>
                 </div>
 
                 {/* Body Content */}
